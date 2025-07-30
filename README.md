@@ -27,3 +27,12 @@ sudo cp monitoring.timer /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now monitoring.timer
 
+## fake-test.sh (если нужно)
+
+Это простой скрипт, который создаёт бесконечный процесс с именем `test`.
+Используется для тестирования работы скрипта мониторинга процесса.
+
+Запуск:
+
+```bash
+./fake-test.sh &
