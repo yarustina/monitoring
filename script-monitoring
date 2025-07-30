@@ -1,0 +1,26 @@
+#!/bin/bash
+
+PROCESS_NAME="test"
+STATE_FILE="/tmp/${PROCESS_NAME}_pid.state"
+LOGFILE="/var/log/monitoring.log"
+API_URL="https://test.com/monitoring/test/api"
+PID=$(pgrep -x "$PROCESS_NAME")
+
+if [[ -z "$PID" ]]; then
+    exit 0
+else
+    if  curl -IL "$API_URL" 2>/dev/null | grep "^HTTP.*200" > /dev/null; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') Monitoring endpoint is available." >> "$LOGFILE"
+    else
+        echo "$(date '+%Y-%m-%d %H:%M:%S') Monitoring endpoint is unavailable." >> "$LOGFILE"
+    fi
+fi
+
+if [[ -f "$STATE_FILE" ]]; then
+    OLD_PID=$(cat "$STATE_FILE")
+    if [[ "$PID" != "$OLD_PID" ]]; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') Process '$PROCESS_NAME' restarted. Old PID: $OLD_PID, New PID: $PID" >> "$LOGFILE"
+    fi
+fi
+
+echo "$PID" > "$STATE_FILE"
